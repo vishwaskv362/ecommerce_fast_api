@@ -23,4 +23,4 @@ app.include_router(wishlist_router, prefix="/wishlists", tags=["wishlists"])
 
 @app.get("/")
 def read_root():
-    return {"message": "Alive and Kicking Bruh!!"}
+    return {"message": "Backend is alive and kicking"}
