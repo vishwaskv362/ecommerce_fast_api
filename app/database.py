@@ -1,6 +1,5 @@
 """Database configuration and session management."""
 from sqlalchemy import create_engine, event, pool
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from .config import settings
 
@@ -24,8 +23,6 @@ if "sqlite" in settings.DATABASE_URL:
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-Base = declarative_base()
-
 
 def get_db() -> Session:
     """Dependency to get database session."""
@@ -38,5 +35,5 @@ def get_db() -> Session:
 
 def init_db():
     """Initialize database tables."""
-    from . import models
+    from .models import Base
     Base.metadata.create_all(bind=engine)
