@@ -1,0 +1,41 @@
+# Development docker-compose with hot reload
+version: '3.8'
+
+services:
+  # FastAPI Application in development mode
+  api:
+    build: .
+    container_name: ecommerce_api_dev
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=dev-secret-key-not-for-production
+      - DATABASE_URL=sqlite:///./ecommerce.db
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_ENABLED=true
+      - DEBUG=true
+      - ENVIRONMENT=development
+    volumes:
+      - ./:/app
+      - ./logs:/app/logs
+    depends_on:
+      - redis
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: ecommerce_redis_dev
+    ports:
+      - "6379:6379"
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+
+networks:
+  ecommerce-network:
+    driver: bridge
