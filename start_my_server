@@ -1,2 +1,0 @@
-set PORT=8080
-uvicorn app.main:app --reload --port $PORT
