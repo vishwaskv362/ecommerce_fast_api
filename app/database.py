@@ -1,24 +1,18 @@
 """Database configuration and session management."""
-from sqlalchemy import create_engine, event, pool
+from sqlalchemy import create_engine, pool
 from sqlalchemy.orm import sessionmaker, Session
 from .config import settings
 
-# Create engine with optimizations
+# Create engine with optimizations for PostgreSQL
 engine = create_engine(
     settings.DATABASE_URL,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.DATABASE_URL else {},
     echo=settings.DB_ECHO,
     pool_pre_ping=True,  # Verify connections before using
-    poolclass=pool.StaticPool if "sqlite" in settings.DATABASE_URL else pool.QueuePool,
+    pool_size=10,  # Connection pool size
+    max_overflow=20,  # Max connections beyond pool_size
+    pool_recycle=3600,  # Recycle connections after 1 hour
+    poolclass=pool.QueuePool,
 )
-
-# Enable foreign keys for SQLite
-if "sqlite" in settings.DATABASE_URL:
-    @event.listens_for(engine, "connect")
-    def set_sqlite_pragma(dbapi_conn, connection_record):
-        cursor = dbapi_conn.cursor()
-        cursor.execute("PRAGMA foreign_keys=ON")
-        cursor.close()
 
 # Create session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

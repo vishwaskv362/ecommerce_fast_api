@@ -140,6 +140,10 @@ Thumbs.db
 ecommerce.db
 sql_app.db
 
+# PostgreSQL
+pgdata/
+postgres-data/
+
 # Logs
 logs/
 *.log

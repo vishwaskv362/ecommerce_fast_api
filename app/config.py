@@ -14,8 +14,8 @@ class Settings(BaseSettings):
     DEBUG: bool = False
     ENVIRONMENT: str = "development"
     
-    # Database
-    DATABASE_URL: str = "sqlite:///./ecommerce.db"
+    # Database - PostgreSQL
+    DATABASE_URL: str = "postgresql://ecommerce_user:ecommerce_pass@localhost:5432/ecommerce_db"
     DB_ECHO: bool = False
     
     # Security

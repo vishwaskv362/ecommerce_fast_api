@@ -29,7 +29,8 @@ A modern, production-ready e-commerce REST API built with FastAPI, featuring JWT
 
 ### Prerequisites
 - Python 3.11+
-- Docker & Docker Compose (optional)
+- PostgreSQL 14+ (or use Docker)
+- Docker & Docker Compose (recommended)
 - Redis (optional, for caching)
 
 ### Installation
@@ -222,7 +223,19 @@ curl -X POST "http://localhost:8000/api/v1/auth/refresh" \
 
 ## 🗄️ Database
 
-The application uses SQLite by default for easy setup. For production, consider PostgreSQL or MySQL.
+The application uses **PostgreSQL** as the primary database for production-ready performance and features.
+
+### PostgreSQL Setup
+
+**Local Installation:**
+```bash
+# Install PostgreSQL (Windows - use installer from postgresql.org)
+# Or use Docker (recommended):
+docker run --name ecommerce-postgres -e POSTGRES_USER=ecommerce_user -e POSTGRES_PASSWORD=ecommerce_pass -e POSTGRES_DB=ecommerce_db -p 5432:5432 -d postgres:16-alpine
+```
+
+**Using Docker Compose (Recommended):**
+PostgreSQL is automatically included in docker-compose.yml
 
 ### Database Migrations
 
@@ -249,8 +262,8 @@ Configuration is managed through environment variables. Copy `.env.example` to `
 # Security
 SECRET_KEY=your-super-secret-key-min-32-characters
 
-# Database
-DATABASE_URL=sqlite:///./ecommerce.db
+# Database (PostgreSQL)
+DATABASE_URL=postgresql://ecommerce_user:ecommerce_pass@localhost:5432/ecommerce_db
 
 # Redis Cache
 REDIS_HOST=localhost

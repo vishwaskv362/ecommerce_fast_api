@@ -2,6 +2,28 @@
 version: '3.8'
 
 services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: ecommerce_postgres_dev
+    environment:
+      - POSTGRES_USER=ecommerce_user
+      - POSTGRES_PASSWORD=ecommerce_pass
+      - POSTGRES_DB=ecommerce_db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-dev-data:/var/lib/postgresql/data
+    networks:
+      - ecommerce-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecommerce_user -d ecommerce_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   # FastAPI Application in development mode
   api:
     build: .
@@ -11,7 +33,7 @@ services:
       - "8000:8000"
     environment:
       - SECRET_KEY=dev-secret-key-not-for-production
-      - DATABASE_URL=sqlite:///./ecommerce.db
+      - DATABASE_URL=postgresql://ecommerce_user:ecommerce_pass@postgres:5432/ecommerce_db
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - REDIS_ENABLED=true
@@ -21,7 +43,10 @@ services:
       - ./:/app
       - ./logs:/app/logs
     depends_on:
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     networks:
       - ecommerce-network
     restart: unless-stopped
@@ -35,6 +60,15 @@ services:
     networks:
       - ecommerce-network
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-dev-data:
+    driver: local
 
 networks:
   ecommerce-network:
